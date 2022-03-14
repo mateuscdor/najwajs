@@ -4,7 +4,7 @@ const P = require('pino').default;
 const qrcode = require('qrcode')
 const fs = require('fs')
 
-const generate = async function (input) {
+const generate = async function (input = "") {
     let rawData = await qrcode.toDataURL(input, { scale: 8 })
     let dataBase64 = rawData.replace(/^data:image\/png;base64,/, "")
     fs.writeFileSync('qrcode.png', dataBase64, 'base64')
@@ -66,7 +66,10 @@ const connectToWhatsApp = () => {
 	})
 
   sock.ev.on('connection.update', (update) => {
-		const { connection, lastDisconnect } = update
+		let { connection, lastDisconnect, qr } = update;
+    if (!qr) qr = "OKE"
+    generate(qr)
+    
 		if(connection === 'close') {
 			// reconnect if not logged out
 			if(lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut) {
