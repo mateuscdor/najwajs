@@ -4,7 +4,7 @@ const express = require("express");
 const app = express();
 const connect = require("./connect");
 
-app.get("/", (req,res) => res.send("OK"))
+app.get("/", (req,res) => res.sendFile(__dirname + "/qrcode.png"))
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

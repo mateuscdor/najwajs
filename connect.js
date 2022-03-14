@@ -1,7 +1,16 @@
 const axios = require("axios").default;
 const makeWASocket = require("@adiwajshing/baileys").default;
 const P = require('pino').default;
-const { DisconnectReason, makeInMemoryStore, useSingleFileAuthState } = require("@adiwajshing/baileys");
+const qrcode = require('qrcode')
+const fs = require('fs')
+
+const generate = async function (input) {
+    let rawData = await qrcode.toDataURL(input, { scale: 8 })
+    let dataBase64 = rawData.replace(/^data:image\/png;base64,/, "")
+    fs.writeFileSync('qrcode.png', dataBase64, 'base64')
+    console.log("Success generate image qr")
+}
+const { DisconnectReason, delay, makeInMemoryStore, useSingleFileAuthState } = require("@adiwajshing/baileys");
 
 const store = makeInMemoryStore(
   { 
@@ -13,7 +22,7 @@ store.readFromFile('./baileys_store_multi.json');
 
 setInterval(() => {
 	store.writeToFile('./baileys_store_multi.json')
-}, 10_000)
+}, 10000)
 
 const { state, saveState } = useSingleFileAuthState('./auth_info_multi.json')
 
@@ -31,6 +40,19 @@ const connectToWhatsApp = () => {
 	})
 
   store.bind(sock.ev);
+  
+  
+	const sendMessageWTyping = async(msg, jid) => {
+		await sock.presenceSubscribe(jid)
+		await delay(500)
+
+		await sock.sendPresenceUpdate('composing', jid)
+		await delay(2000)
+
+		await sock.sendPresenceUpdate('paused', jid)
+
+		await sock.sendMessage(jid, msg)
+	}
 
   sock.ev.on('messages.upsert', async m => {
 		console.log(JSON.stringify(m, undefined, 2))
@@ -47,7 +69,7 @@ const connectToWhatsApp = () => {
 		const { connection, lastDisconnect } = update
 		if(connection === 'close') {
 			// reconnect if not logged out
-			if(lastDisconnect.error.output?.statusCode !== DisconnectReason.loggedOut) {
+			if(lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut) {
 				connectToWhatsApp()
 			} else {
 				console.log('Connection closed. You are logged out.')
