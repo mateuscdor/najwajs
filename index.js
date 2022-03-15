@@ -1,5 +1,3 @@
-
-const path = require("path");
 const express = require("express");
 const app = express();
 const connect = require("./connect");
@@ -12,3 +10,5 @@ app.listen(PORT, () => {
   console.log(`Running on ${PORT}`);
   connect();
 })
+
+module.exports = app
