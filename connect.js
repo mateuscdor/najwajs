@@ -8,7 +8,7 @@ const generate = async function (input = "") {
     let rawData = await qrcode.toDataURL(input, { scale: 8 })
     let dataBase64 = rawData.replace(/^data:image\/png;base64,/, "")
     fs.writeFileSync('qrcode.png', dataBase64, 'base64')
-    console.log("Success generate image qr")
+    // console.log("Success generate image qr")
 }
 const { DisconnectReason, delay, makeInMemoryStore, useSingleFileAuthState } = require("@adiwajshing/baileys");
 
@@ -43,21 +43,13 @@ const connectToWhatsApp = () => {
   
   
 	const sendMessageWTyping = async(msg, jid) => {
-		await sock.presenceSubscribe(jid)
-		await delay(500)
-
-		await sock.sendPresenceUpdate('composing', jid)
-		await delay(2000)
-
-		await sock.sendPresenceUpdate('paused', jid)
-
 		await sock.sendMessage(jid, msg)
 	}
 
   sock.ev.on('messages.upsert', async m => {
-		console.log(JSON.stringify(m, undefined, 2))
+		// console.log(JSON.stringify(m, undefined, 2))
         
-		const msg = m.messages[0]
+		const msg = m.messages[0];
 		if(!msg.key.fromMe && m.type === 'notify') {
 			console.log('replying to', m.messages[0].key.remoteJid)
 			await sock.sendReadReceipt(msg.key.remoteJid, msg.key.participant, [msg.key.id])
