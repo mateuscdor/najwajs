@@ -2457,8 +2457,8 @@
         {
           "senderKeyId": 229818654,
           "senderChainKey": {
-            "iteration": 9,
-            "seed": "3/Y+JnzEoy3+02FLcfMbyfLBxZa7hzpbXgWRG6PDd/o="
+            "iteration": 23,
+            "seed": "BbbbCDCVbps8cFd4822o7jevsXwYYDSdnxci1dIV2i4="
           },
           "senderSigningKey": {
             "public": "BUFuBht4G8mnjRp0xc/BcRq+Q3J7SgjlsHlJ5YTy84sA"
@@ -2470,8 +2470,8 @@
         {
           "senderKeyId": 1181664082,
           "senderChainKey": {
-            "iteration": 8,
-            "seed": "dopWnMHP8rLYlqZdTfqIRFrzj0yuh6f0zL4GLfga7eE="
+            "iteration": 23,
+            "seed": "vJIeBq7sL2IA+GSSo26NLY32idS0GyVug5eIhiRpxP4="
           },
           "senderSigningKey": {
             "public": "BX3JrcZ5Enb97rQrJrQt5W4WfaEznLP9JYMSdSXOr0ZP",
