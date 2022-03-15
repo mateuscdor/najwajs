@@ -15,7 +15,9 @@ module.exports = async (command = "", message) => {
   body = body.replace(`/${command}`, "").trim();
 
   let secondArgs = message.body.split(" ")[1] || "";
+  secondArgs = secondArgs.trim();
   let thirdArgs = message.body.split(" ")[2] || "";
+  thirdArgs = thirdArgs.trim();
 
   let res = null;
   let data = null;
@@ -99,10 +101,9 @@ module.exports = async (command = "", message) => {
     case "fakedata":
       let ccode = "en";
       if (secondArgs) {
-        if (secondArgs != "en" || secondArgs != "ru") {
-          return "Maaf hanya dapat menginput kode *en* dan *ru*";
-        } else ccode = secondArgs;
-        
+        if (secondArgs == "en" || secondArgs == "ru") {          
+          ccode = secondArgs;
+        } else return "Maaf hanya dapat menginput kode *en* dan *ru*";
       } 
       res = await axios.get(
         `https://zenzapi.xyz/api/fakedata?country=${ccode}&apikey=rasyidrafi`
@@ -114,8 +115,6 @@ module.exports = async (command = "", message) => {
         Object.keys(data.result).forEach((key) => {
           if (key == "code" || key == "message") return;
           let val = "";
-          
-          if (key == "birthday") val = moment(data.result.bi)
           
           switch (typeof data.result[key]) {
             case "string":
@@ -130,6 +129,8 @@ module.exports = async (command = "", message) => {
             default:
               break;
           }
+          
+          if (key == "birthday") val = moment(data.result.birthday).format("YYYY-MM-DD HH:mm:ss");
 
           hold += `${reformat(key)}: ${val}\n`;
         });
@@ -137,8 +138,20 @@ module.exports = async (command = "", message) => {
         hold += "\nBy Najwa Bot";
         return hold
       } else return "Fitur sedang tidak bisa digunakan";
+      break;
       
+    case "artinama":
+      if (!secondArgs) return "Format: /artinama <nama kamu>\nContoh: /artinama budi";
+      res = await axios.get(
+        `https://zenzapi.xyz/api/artinama?text=${secondArgs}%20rafi&apikey=rasyidrafi`
+      );
+      data = res.data;
       
+      if (data.status == "OK") {
+        let hold = `Nama: ${data.result.nama}\n\n${data.result.arti}`;
+        return hold;
+      }
+      else return "Fitur sedang tidak bisa digunakan";
       break;
 
     default:
