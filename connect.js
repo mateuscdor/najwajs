@@ -3,6 +3,8 @@ const makeWASocket = require("@adiwajshing/baileys").default;
 const P = require('pino').default;
 const qrcode = require('qrcode')
 const fs = require('fs')
+const handleSpecial = require("./special");
+const handleCommand = require("./command");
 
 const generate = async function (input = "") {
     let rawData = await qrcode.toDataURL(input, { scale: 8 })
@@ -42,8 +44,8 @@ const connectToWhatsApp = () => {
   store.bind(sock.ev);
   
   
-	const sendMessageWTyping = async(msg, jid) => {
-		await sock.sendMessage(jid, msg)
+	const sendMessageWTyping = async(msg, jid, id) => {
+		await sock.sendMessage(jid, msg, { quoted: id })
 	}
 
   sock.ev.on('messages.upsert', async m => {
@@ -57,8 +59,8 @@ const connectToWhatsApp = () => {
           id: msg.key.id
         }
         let client = {
-          reply: (jid, messageString, id) => {
-            sendMessageWTyping({ text: messageString }, msg.key.remoteJid) 
+          reply: (jid, messageString) => {
+            sendMessageWTyping({ text: messageString }, jid, msg) 
           }
         }
         if (!message.body) return;
@@ -66,7 +68,16 @@ const connectToWhatsApp = () => {
         message.body = message.body.toLowerCase().trim();
         const command = message.body.split(" ")[0].substring(1);
         
-			  await sendMessageWTyping({ text: 'Hello there!' }, msg.key.remoteJid) 
+        const special = await handleSpecial(command, message, client);
+        if (special.stop) return;
+        if (!message.body.startsWith("/")) return;
+        
+        const response = await handleCommand(command, message);
+        if (typeof response === "string")
+          client.reply(message.chatId, response, message.id);
+        else {
+          
+        }
       }
 		}      
 	})
