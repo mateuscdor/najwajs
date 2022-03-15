@@ -51,9 +51,11 @@ const connectToWhatsApp = () => {
         
 		const msg = m.messages[0];
 		if(!msg.key.fromMe && m.type === 'notify') {
-			console.log('replying to', m.messages[0].key.remoteJid)
-			await sock.sendReadReceipt(msg.key.remoteJid, msg.key.participant, [msg.key.id])
-			await sendMessageWTyping({ text: 'Hello there!' }, msg.key.remoteJid)
+			// console.log('replying to', m.messages[0].key.remoteJid)
+      if (msg.message.conversation) {
+        await sock.sendReadReceipt(msg.key.remoteJid, msg.key.participant, [msg.key.id])
+			  await sendMessageWTyping({ text: 'Hello there!' }, msg.key.remoteJid) 
+      }
 		}      
 	})
 
@@ -71,7 +73,8 @@ const connectToWhatsApp = () => {
 			}
 		}
         
-		console.log('connection update', update)
+		// console.log('connection update', update)
+    
 	})
 
   // listen for when the auth credentials is updated
