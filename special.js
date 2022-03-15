@@ -73,7 +73,7 @@ module.exports = async (command = "", message, client) => {
 
     if (body.startsWith("tanyabaru")) {
       msg =
-        "Saya akan memberi pertanyaan, silahkan jawab dengan awalan kata jawab <jawaban>\nbalas menyerah untuk menyerah\nbalas tanyabaru untuk pertanyaan baru";
+        "Saya akan memberi pertanyaan, silahkan jawab dengan awalan kata *jawab <jawaban>*\nbalas *menyerah* untuk menyerah\nbalas *tanyabaru* untuk pertanyaan baru";
       client.reply(message.chatId, msg, message.id);
 
       res = await axios.get(
@@ -101,7 +101,7 @@ module.exports = async (command = "", message, client) => {
 
       msg = `Soal: *${state.caklontong_data[message.chatId].soal}*\nJawab: ${
         state.caklontong_data[message.chatId].placeholderjawaban
-      }\n\nSilahkan menjawab dengan awalan kata jawab <jawaban>`;
+      }\n\nSilahkan menjawab dengan awalan kata *jawab <jawaban>*`;
       client.reply(message.chatId, msg, message.id);
     }
   }
@@ -122,7 +122,7 @@ module.exports = async (command = "", message, client) => {
           if (state.caklontong[message.chatId]) {
             state.caklontong[message.chatId] = false;
             msg =
-              "Mode Caklontong dan Simsimi tidak bisa digunakan bersamaan, menonaktifkan mode caklontong";
+              "Mode cak lontong dan Simsimi tidak bisa digunakan bersamaan, menonaktifkan mode cak lontong";
             client.reply(message.chatId, msg, message.id);
             return { stop: true };
           }
@@ -161,14 +161,14 @@ module.exports = async (command = "", message, client) => {
           if (state.simsimi[message.chatId]) {
             state.simsimi[message.chatId] = false;
             msg =
-              "Mode Caklontong dan Simsimi tidak bisa digunakan bersamaan, menonaktifkan mode simsimi";
+              "Mode cak lontong dan Simsimi tidak bisa digunakan bersamaan, menonaktifkan mode simsimi";
             client.reply(message.chatId, msg, message.id);
             return { stop: true };
           }
 
           state.caklontong[message.chatId] = true;
           msg =
-            "Mode CakLontong dimulai, Saya akan memberi pertanyaan, silahkan jawab dengan awalan kata jawab <jawaban>\nbalas menyerah untuk menyerah\nbalas tanyabaru untuk pertanyaan baru";
+            "Mode cak lontong dimulai, Saya akan memberi pertanyaan, silahkan jawab dengan awalan kata *jawab <jawaban>*\nbalas *menyerah* untuk menyerah\nbalas *tanyabaru* untuk pertanyaan baru";
           client.reply(message.chatId, msg, message.id);
 
           res = await axios.get(
@@ -198,14 +198,14 @@ module.exports = async (command = "", message, client) => {
             state.caklontong_data[message.chatId].soal
           }*\nJawab: ${
             state.caklontong_data[message.chatId].placeholderjawaban
-          }\n\nSilahkan menjawab dengan awalan kata jawab <jawaban>`;
+          }\n\nSilahkan menjawab dengan awalan kata *jawab <jawaban>*`;
           client.reply(message.chatId, msg, message.id);
 
           return { stop: true };
           break;
         case "off":
           state.caklontong[message.chatId] = false;
-          msg = "Mode CakLontong telah berhenti";
+          msg = "Mode cak lontong telah berhenti";
           client.reply(message.chatId, msg, message.id);
           return { stop: true };
           break;

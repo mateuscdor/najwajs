@@ -94,6 +94,10 @@ module.exports = async (command = "", message) => {
         filename: "darkjoke.jpg",
       };
       break;
+      
+    case "fakedata":
+      
+      break;
 
     default:
       if (message.body.startsWith("/")) {

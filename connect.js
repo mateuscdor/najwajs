@@ -64,7 +64,8 @@ const connectToWhatsApp = () => {
           },
           sendImage: async (jid, dataUrl, filename, caption, id) => {
             await sock.sendMessage(jid, {
-              image: { url: dataUrl, caption }
+              image: { url: dataUrl },
+              caption
             }, { quoted: msg })
           }
         }
