@@ -47,13 +47,25 @@ const connectToWhatsApp = () => {
 	}
 
   sock.ev.on('messages.upsert', async m => {
-		// console.log(JSON.stringify(m, undefined, 2))
-        
 		const msg = m.messages[0];
 		if(!msg.key.fromMe && m.type === 'notify') {
-			// console.log('replying to', m.messages[0].key.remoteJid)
       if (msg.message.conversation) {
-        await sock.sendReadReceipt(msg.key.remoteJid, msg.key.participant, [msg.key.id])
+        await sock.sendReadReceipt(msg.key.remoteJid, msg.key.participant, [msg.key.id]);
+        let message = { 
+          body: msg.message.conversation,
+          chatId: msg.key.remoteJid,
+          id: msg.key.id
+        }
+        let client = {
+          reply: (jid, messageString, id) => {
+            sendMessageWTyping({ text: messageString }, msg.key.remoteJid) 
+          }
+        }
+        if (!message.body) return;
+        
+        message.body = message.body.toLowerCase().trim();
+        const command = message.body.split(" ")[0].substring(1);
+        
 			  await sendMessageWTyping({ text: 'Hello there!' }, msg.key.remoteJid) 
       }
 		}      
