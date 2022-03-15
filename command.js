@@ -143,12 +143,27 @@ module.exports = async (command = "", message) => {
     case "artinama":
       if (!secondArgs) return "Format: /artinama <nama kamu>\nContoh: /artinama budi";
       res = await axios.get(
-        `https://zenzapi.xyz/api/artinama?text=${secondArgs}%20rafi&apikey=rasyidrafi`
+        `https://zenzapi.xyz/api/artinama?text=${body}&apikey=rasyidrafi`
       );
       data = res.data;
       
       if (data.status == "OK") {
         let hold = `Nama: ${data.result.nama}\n\n${data.result.arti}`;
+        return hold;
+      }
+      else return "Fitur sedang tidak bisa digunakan";
+      break;
+    
+    case "artimimpi":
+      if (!secondArgs) return "Format: /artimimpi <kata mimpi>\nContoh: /artimimpi mandi";
+      res = await axios.get(
+        `https://zenzapi.xyz/api/artimimpi?query=${body}&apikey=rasyidrafi`
+      );
+      data = res.data;
+      
+      if (data.status == "OK") {
+        if (typeof data.result == "string") return data.result;
+        let hold = `Mimpi: ${data.result.mimpi}\n\n${data.result.arti}\n\nSolusi:\n${data.result.solusi}`;
         return hold;
       }
       else return "Fitur sedang tidak bisa digunakan";
