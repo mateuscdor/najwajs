@@ -2393,12 +2393,13 @@
         {
           "senderKeyId": 293677182,
           "senderChainKey": {
-            "iteration": 3,
-            "seed": "G4oUbOCrxC9U1WQfiOF+5kwYYYJ2Z4Y/cH+cp57Vl1Y="
+            "iteration": 5,
+            "seed": "TL3I9d9GT1mCsuq/tE/B6ZgezoHdhN/Wj6FGwHvM648="
           },
           "senderSigningKey": {
             "public": "BUPvI6zNH4Y2RWspKQdFEgxyw9HLrnjRnaa6nLEw+8hU"
-          }
+          },
+          "senderMessageKeys": []
         }
       ]
     },

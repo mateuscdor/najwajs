@@ -1,4 +1,5 @@
 const axios = require("axios").default;
+const moment = require("moment");
 
 const reformat = (string = "") => {
   string = string.replace(/_/g, " ").toLowerCase();
@@ -96,6 +97,47 @@ module.exports = async (command = "", message) => {
       break;
       
     case "fakedata":
+      let ccode = "en";
+      if (secondArgs) {
+        if (secondArgs != "en" || secondArgs != "ru") {
+          return "Maaf hanya dapat menginput kode *en* dan *ru*";
+        } else ccode = secondArgs;
+        
+      } 
+      res = await axios.get(
+        `https://zenzapi.xyz/api/fakedata?country=${ccode}&apikey=rasyidrafi`
+      );
+      data = res.data;
+      
+      if (data.status == "OK") {
+        let hold = "";
+        Object.keys(data.result).forEach((key) => {
+          if (key == "code" || key == "message") return;
+          let val = "";
+          
+          if (key == "birthday") val = moment(data.result.bi)
+          
+          switch (typeof data.result[key]) {
+            case "string":
+            case "number":
+              val = data.result[key];
+              break;
+
+            case "boolean":
+              val = data.result[key] ? "Ya" : "Tidak";
+              break;
+
+            default:
+              break;
+          }
+
+          hold += `${reformat(key)}: ${val}\n`;
+        });
+
+        hold += "\nBy Najwa Bot";
+        return hold
+      } else return "Fitur sedang tidak bisa digunakan";
+      
       
       break;
 
