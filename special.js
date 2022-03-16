@@ -169,14 +169,14 @@ module.exports = async (command = "", message, client) => {
       data = res.data;
       if (data.status == "OK") {
         state.music[message.chatId] = true;
-        let caption = `${data.result.title}\n\nChannel: ${data.result.channel}\nPublish: ${data.result.published}\n\nApakah ini benar yang anda maksud, balas ya / tidak, invalid dalam 5 detik`;
+        let caption = `${data.result.title}\n\nChannel: ${data.result.channel}\nPublish: ${data.result.published}\n\nApakah ini benar yang anda maksud, balas *ya / tidak*, invalid dalam 10 detik`;
         await client.sendMedia(message.chatId, data.result.thumb, "ytmp3.jpg", caption, "image");
         state.music_data[message.chatId] = {
           timeout: setTimeout(() => {
             state.music[message.chatId] = false;
             state.music_data[message.chatId] = "";
-            client.reply(message.chatId, "Invalid, anda tidak membalas dalam 5 detik", message.id);
-          }, 5000),
+            client.reply(message.chatId, "Invalid, anda tidak membalas dalam 10 detik", message.id);
+          }, 10000),
           url: data.result.url,
           title: data.result.title,
         };
