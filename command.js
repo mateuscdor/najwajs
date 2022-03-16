@@ -150,6 +150,7 @@ module.exports = async (command = "", message) => {
       break;
 
     case "image":
+    case "images":
       if (!secondArgs)
         return "Format: /image <cari gambar apa>\nContoh: /image Naruto";
 
