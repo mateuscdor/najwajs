@@ -9,14 +9,14 @@ const state = {
   simsimi: {},
   caklontong: {},
   caklontong_data: {},
+  music: {},
+  music_data: {},
 };
 
 module.exports = async (command = "", message, client) => {
   let res = null;
   let data = null;
   let msg = "";
-
-  console.log(state);
 
   if (state.simsimi[message.chatId]) {
     let body = message.body;
@@ -43,30 +43,24 @@ module.exports = async (command = "", message, client) => {
     if (body.startsWith("jawab")) {
       let jawaban = body.replace("jawab", "").trim();
       if (state.caklontong_data[message.chatId].jawaban == jawaban) {
-        msg = `SELAMAT Jawaban anda benar\n\nSoal : *${
-          state.caklontong_data[message.chatId].soal
-        }*\nJawaban : ${
-          state.caklontong_data[message.chatId].jawaban
-        }\nDeskripsi : ${state.caklontong_data[message.chatId].deskripsi}`;
+        msg = `SELAMAT Jawaban anda benar\n\nSoal : *${state.caklontong_data[message.chatId].soal
+          }*\nJawaban : ${state.caklontong_data[message.chatId].jawaban
+          }\nDeskripsi : ${state.caklontong_data[message.chatId].deskripsi}`;
         client.reply(message.chatId, msg, message.id);
         if (!message.body.startsWith("/")) return { stop: true };
       } else {
-        msg = `Jawaban anda salah\n\nSoal : *${
-            state.caklontong_data[message.chatId].soal
-          }*\nJawaban : ${
-          state.caklontong_data[message.chatId].placeholderjawaban
-        }`;
+        msg = `Jawaban anda salah\n\nSoal : *${state.caklontong_data[message.chatId].soal
+          }*\nJawaban : ${state.caklontong_data[message.chatId].placeholderjawaban
+          }`;
         client.reply(message.chatId, msg, message.id);
         if (!message.body.startsWith("/")) return { stop: true };
       }
     }
 
     if (body.startsWith("menyerah")) {
-      msg = `Sayang sekali anda menyerah\n\nSoal : *${
-        state.caklontong_data[message.chatId].soal
-      }*\nJawaban : ${
-        state.caklontong_data[message.chatId].jawaban
-      }\nDeskripsi : ${state.caklontong_data[message.chatId].deskripsi}`;
+      msg = `Sayang sekali anda menyerah\n\nSoal : *${state.caklontong_data[message.chatId].soal
+        }*\nJawaban : ${state.caklontong_data[message.chatId].jawaban
+        }\nDeskripsi : ${state.caklontong_data[message.chatId].deskripsi}`;
       client.reply(message.chatId, msg, message.id);
       if (!message.body.startsWith("/")) return { stop: true };
     }
@@ -99,15 +93,28 @@ module.exports = async (command = "", message, client) => {
         deskripsi: deskripsi.toLowerCase(),
       };
 
-      msg = `Soal: *${state.caklontong_data[message.chatId].soal}*\nJawab: ${
-        state.caklontong_data[message.chatId].placeholderjawaban
-      }\n\nSilahkan menjawab dengan awalan kata *jawab <jawaban>*`;
+      msg = `Soal: *${state.caklontong_data[message.chatId].soal}*\nJawab: ${state.caklontong_data[message.chatId].placeholderjawaban
+        }\n\nSilahkan menjawab dengan awalan kata *jawab <jawaban>*`;
       client.reply(message.chatId, msg, message.id);
+    }
+  }
+  if (state.music[message.chatId]) {
+    let body = message.body.trim();
+    if (body == "ya") {
+      clearTimeout(state.music_data[message.chatId].timeout);
+      await client.reply(message.chatId, `Sedang Mendownload *${state.music_data[message.chatId].title}*`, message.id);
+      await client.sendMedia(message.chatId, state.music_data[message.chatId].url, "musik.mp3", "", "audio");
+    } else if (body == "tidak") {
+      state.music[message.chatId] = false;
+      state.music_data[message.chatId] = "";
+      client.reply(message.chatId, "Oke, dibatalkan", message.id);
     }
   }
 
   let secondArgs = message.body.split(" ")[1] || "";
   let thirdArgs = message.body.split(" ")[2] || "";
+  let full = message.body;
+  full = full.replace(`/${command}`, "").trim();
 
   switch (command) {
     case "simsimi":
@@ -146,6 +153,38 @@ module.exports = async (command = "", message, client) => {
           return { stop: true };
           break;
       }
+      break;
+
+    case "music":
+    case "musik":
+      if (!secondArgs) {
+        msg = "Format: /musik <query>\nContoh: /musik on my way";
+        client.reply(message.chatId, msg, message.id);
+        return { stop: true };
+      }
+
+      res = await axios.get(
+        `https://zenzapi.xyz/downloader/play/playmp3?query=${full}&apikey=rasyidrafi`
+      )
+      data = res.data;
+      if (data.status == "OK") {
+        state.music[message.chatId] = true;
+        let caption = `${data.result.title}\n\nChannel: ${data.result.channel}\nPublish: ${data.result.published}\n\nApakah ini benar yang anda maksud, balas ya / tidak, invalid dalam 5 detik`;
+        await client.sendMedia(message.chatId, data.result.thumb, "ytmp3.jpg", caption, "image");
+        state.music_data[message.chatId] = {
+          timeout: setTimeout(() => {
+            state.music[message.chatId] = false;
+            state.music_data[message.chatId] = "";
+            client.reply(message.chatId, "Invalid, anda tidak membalas dalam 5 detik", message.id);
+          }, 5000),
+          url: data.result.url,
+          title: data.result.title,
+        };
+      } else {
+        msg = "Fitur sedang tidak bisa digunakan";
+        return { stop: true };
+      };
+
       break;
 
     case "caklontong":
@@ -194,11 +233,9 @@ module.exports = async (command = "", message, client) => {
             deskripsi: deskripsi.toLowerCase(),
           };
 
-          msg = `Soal: *${
-            state.caklontong_data[message.chatId].soal
-          }*\nJawab: ${
-            state.caklontong_data[message.chatId].placeholderjawaban
-          }\n\nSilahkan menjawab dengan awalan kata *jawab <jawaban>*`;
+          msg = `Soal: *${state.caklontong_data[message.chatId].soal
+            }*\nJawab: ${state.caklontong_data[message.chatId].placeholderjawaban
+            }\n\nSilahkan menjawab dengan awalan kata *jawab <jawaban>*`;
           client.reply(message.chatId, msg, message.id);
 
           return { stop: true };
