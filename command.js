@@ -72,6 +72,7 @@ module.exports = async (command = "", message) => {
               caption: hold,
               dataUrl: data.result.caption.profile_hd || "",
               filename: `${thirdArgs}.jpg`,
+              type: "image"
             };
           } else return "Username tidak ditemukan";
           break;
@@ -87,6 +88,7 @@ module.exports = async (command = "", message) => {
         caption: "",
         dataUrl: "https://zenzapi.xyz/api/random/darkjoke?apikey=rasyidrafi",
         filename: "darkjoke.jpg",
+        type: "image"
       };
       break;
 
@@ -95,7 +97,8 @@ module.exports = async (command = "", message) => {
       return {
         caption: "",
         dataUrl: "https://zenzapi.xyz/api/random/memeindo?apikey=rasyidrafi",
-        filename: "darkjoke.jpg",
+        filename: "memeindo.jpg",
+        type: "image"
       };
       break;
       
@@ -151,6 +154,25 @@ module.exports = async (command = "", message) => {
       if (data.status == "OK") {
         let hold = `Nama: ${data.result.nama}\n\n${data.result.arti}`;
         return hold;
+      }
+      else return "Fitur sedang tidak bisa digunakan";
+      break;
+    
+    case "tiktok":
+      if (!secondArgs) return "Format: /tiktok <url>";
+      res = await axios.get(
+        `https://zenzapi.xyz/downloader/tiktok?url=${body}&apikey=rasyidrafi`
+      );
+      data = res.data;
+      
+      if (data.status == "OK") {
+        let hold = `Url: ${body}\nUntuk mendownload versi watermark gunakan url berikut: ${data.result.watermark}`;
+        return {
+          caption: hold,
+          dataUrl: data.result.nowatermark,
+          filename: "tiktok.mp4",
+          type: "video"
+        };
       }
       else return "Fitur sedang tidak bisa digunakan";
       break;

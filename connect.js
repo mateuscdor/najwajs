@@ -67,6 +67,12 @@ const connectToWhatsApp = () => {
               image: { url: dataUrl },
               caption
             }, { quoted: msg })
+          },
+          sendMedia: async (jid, dataUrl, filename, caption, type) => {
+            await sock.sendMessage(jid, {
+              [type]: { url: dataUrl },
+              caption
+            }, { quoted: msg })
           }
         }
         if (!message.body) return;
@@ -82,12 +88,12 @@ const connectToWhatsApp = () => {
         if (typeof response === "string")
           client.reply(message.chatId, response, message.id);
         else {
-          client.sendImage(
+          client.sendMedia(
           message.chatId,
           response.dataUrl,
           response.filename,
           response.caption,
-          message.id
+          response.type
         );
         }
       }
