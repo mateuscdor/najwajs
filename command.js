@@ -2,6 +2,11 @@ const axios = require("axios").default;
 const moment = require("moment");
 const helpTxt = require("./lib/help");
 
+const randomArr = (arr = []) => {
+  const random = Math.floor(Math.random() * arr.length);
+  return arr[random];
+}
+
 const reformat = (string = "") => {
   string = string.replace(/_/g, " ").toLowerCase();
   string = string.replace(/\w\S*/g, function (txt) {
@@ -142,6 +147,26 @@ module.exports = async (command = "", message) => {
         hold += "\nBy Najwa Bot";
         return hold
       } else return "Fitur sedang tidak bisa digunakan";
+      break;
+
+    case "image":
+      if (!secondArgs)
+        return "Format: /image <cari gambar apa>\nContoh: /image Naruto";
+
+      res = await axios.get(
+        `https://zenzapi.xyz/searching/gimage?query=${body}&apikey=rasyidrafi`
+      );
+      data = res.data;
+
+      if (data.status == "OK") {
+        return {
+          caption: `Hasil Pencarian:\n${body}`,
+          dataUrl: randomArr(data.result),
+          filename: "imagegoogle.jpg",
+          type: "image"
+        };
+      } else return "Fitur sedang tidak bisa digunakan";
+
       break;
       
     case "motivasi":
