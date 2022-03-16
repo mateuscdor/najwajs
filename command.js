@@ -144,6 +144,16 @@ module.exports = async (command = "", message) => {
       } else return "Fitur sedang tidak bisa digunakan";
       break;
       
+    case "motivasi":
+      res = await axios.get(
+        `https://zenzapi.xyz/api/motivasi?apikey=rasyidrafi`
+      );
+      data = res.data;
+      if (data.status == "OK") {
+        return `_*${data.result.message}*_`
+      } else return "Fitur sedang tidak bisa digunakan";
+      break;
+
     case "artinama":
       if (!secondArgs) return "Format: /artinama <nama kamu>\nContoh: /artinama budi";
       res = await axios.get(
@@ -166,7 +176,7 @@ module.exports = async (command = "", message) => {
       data = res.data;
       
       if (data.status == "OK") {
-        let hold = `Url: ${body}\nUntuk mendownload versi watermark gunakan url berikut: ${data.result.watermark}`;
+        let hold = `Url: ${body}\n\nUntuk mendownload versi watermark gunakan url berikut: ${data.result.watermark}`;
         return {
           caption: hold,
           dataUrl: data.result.nowatermark,
