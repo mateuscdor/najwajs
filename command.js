@@ -1,5 +1,6 @@
 const axios = require("axios").default;
 const moment = require("moment");
+const helpTxt = require("./lib/help");
 
 const reformat = (string = "") => {
   string = string.replace(/_/g, " ").toLowerCase();
@@ -27,7 +28,7 @@ module.exports = async (command = "", message) => {
     case "menu":
     case "help":
     case "halo":
-      return "Halo, saya adalah Najwa Bot, maaf bot ini hanya khusus diperuntukkan untuk penggunaan pribadi";
+      return helpTxt;
       break;
 
     case "stalk":
