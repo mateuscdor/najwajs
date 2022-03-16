@@ -51,51 +51,55 @@ const connectToWhatsApp = () => {
   sock.ev.on('messages.upsert', async m => {
 		const msg = m.messages[0];
 		if(!msg.key.fromMe && m.type === 'notify') {
-      if (msg.message.conversation) {
-        await sock.sendReadReceipt(msg.key.remoteJid, msg.key.participant, [msg.key.id]);
-        let message = { 
-          body: msg.message.conversation,
-          chatId: msg.key.remoteJid,
-          id: msg.key.id
-        }
-        let client = {
-          reply: (jid, messageString) => {
-            sendMessageWTyping({ text: messageString }, jid, msg) 
-          },
-          sendImage: async (jid, dataUrl, filename, caption, id) => {
-            await sock.sendMessage(jid, {
-              image: { url: dataUrl },
-              caption
-            }, { quoted: msg })
-          },
-          sendMedia: async (jid, dataUrl, filename, caption, type) => {
-            await sock.sendMessage(jid, {
-              [type]: { url: dataUrl },
-              caption
-            }, { quoted: msg })
+      try {
+        if (msg.message.conversation) {
+          await sock.sendReadReceipt(msg.key.remoteJid, msg.key.participant, [msg.key.id]);
+          let message = { 
+            body: msg.message.conversation,
+            chatId: msg.key.remoteJid,
+            id: msg.key.id
           }
-        }
-        if (!message.body) return;
+          let client = {
+            reply: (jid, messageString) => {
+              sendMessageWTyping({ text: messageString }, jid, msg) 
+            },
+            sendImage: async (jid, dataUrl, filename, caption, id) => {
+              await sock.sendMessage(jid, {
+                image: { url: dataUrl },
+                caption
+              }, { quoted: msg })
+            },
+            sendMedia: async (jid, dataUrl, filename, caption, type) => {
+              await sock.sendMessage(jid, {
+                [type]: { url: dataUrl },
+                caption
+              }, { quoted: msg })
+            }
+          }
+          if (!message.body) return;
+          
+          message.body = message.body.toLowerCase().trim();
+          const command = message.body.split(" ")[0].substring(1);
+          
+          const special = await handleSpecial(command, message, client);
+          if (special.stop) return;
+          if (!message.body.startsWith("/")) return;
+          
+          const response = await handleCommand(command, message);
+          if (typeof response === "string")
+            client.reply(message.chatId, response, message.id);
+          else {
+            client.sendMedia(
+            message.chatId,
+            response.dataUrl,
+            response.filename,
+            response.caption,
+            response.type
+          );
+          }
+        } 
+      } catch (error) {
         
-        message.body = message.body.toLowerCase().trim();
-        const command = message.body.split(" ")[0].substring(1);
-        
-        const special = await handleSpecial(command, message, client);
-        if (special.stop) return;
-        if (!message.body.startsWith("/")) return;
-        
-        const response = await handleCommand(command, message);
-        if (typeof response === "string")
-          client.reply(message.chatId, response, message.id);
-        else {
-          client.sendMedia(
-          message.chatId,
-          response.dataUrl,
-          response.filename,
-          response.caption,
-          response.type
-        );
-        }
       }
 		}      
 	})
