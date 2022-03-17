@@ -203,6 +203,27 @@ module.exports = async (command = "", message) => {
       else return "Fitur sedang tidak bisa digunakan";
       break;
 
+    case "pinterestdl":
+      if (!secondArgs) return "Format: /pinterestdl <url>";
+      res = await axios.get(
+        `https://zenzapi.xyz/downloader/pinterestdl?url=${body}&apikey=rasyidrafi`
+      );
+      data = res.data;
+
+      if (data.status == "OK") {
+        try {
+          return {
+            caption: "",
+            dataUrl: data.result,
+            filename: "pinterest",
+            type: data.result.includes("videos") ? "video" : "image"
+          };
+        } catch (error) {
+          return "Url tidak valid";
+        }
+      } else return "Fitur sedang tidak bisa digunakan";
+      break;
+
     case "artimimpi":
       if (!secondArgs) return "Format: /artimimpi <kata mimpi>\nContoh: /artimimpi mandi";
       res = await axios.get(
