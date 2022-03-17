@@ -133,8 +133,8 @@ module.exports = async (command = "", message, client) => {
         } else if (custom == 0 || custom > mainData.length) {
           client.reply(message.chatId, "Angka invalid", message.id);
         } else {
-          let type = mainData[custom].includes(".mp4") ? "video" : "image";
-          client.sendMedia(message.chatId, mainData[custom], "", "", type)
+          let type = mainData[custom - 1].includes(".mp4") ? "video" : "image";
+          client.sendMedia(message.chatId, mainData[custom - 1], "", "", type)
         }
         break;
     }
