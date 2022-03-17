@@ -144,9 +144,7 @@ module.exports = async (command = "", message, client) => {
       state.joox_data[message.chatId] = "";
       client.reply(message.chatId, "Oke, dibatalkan", message.id);
     }
-  }
-
-  if (state.joox_lirik[message.chatId]) {
+  } else if (state.joox_lirik[message.chatId]) {
     let body = message.body.trim();
     let mainData = state.joox_lirik_data[message.chatId].data;
 
