@@ -13,6 +13,10 @@ const state = {
   music_data: {},
   instagram: {},
   instagram_data: {},
+  joox: {},
+  joox_data: {},
+  joox_lirik: {},
+  joox_lirik_data: {}
 };
 
 module.exports = async (command = "", message, client) => {
@@ -105,7 +109,7 @@ module.exports = async (command = "", message, client) => {
     if (body == "ya") {
       clearTimeout(state.music_data[message.chatId].timeout);
       await client.reply(message.chatId, `Sedang Mendownload *${state.music_data[message.chatId].title}*`, message.id);
-      await client.sendMedia(message.chatId, state.music_data[message.chatId].url, "musik.mp3", "", "audio");
+      client.sendMedia(message.chatId, state.music_data[message.chatId].url, "musik.mp3", "", "audio");
     } else if (body == "tidak") {
       clearTimeout(state.music_data[message.chatId].timeout);
       state.music[message.chatId] = false;
@@ -113,6 +117,50 @@ module.exports = async (command = "", message, client) => {
       client.reply(message.chatId, "Oke, dibatalkan", message.id);
     }
   }
+  if (state.joox[message.chatId]) {
+    let body = message.body.trim();
+    let mainData = state.joox_data[message.chatId].data;
+    if (body == "ya") {
+      clearTimeout(state.joox_data[message.chatId].timeout);
+      await client.reply(message.chatId, `Sedang Mendownload *${mainData.lagu}*`, message.id);
+      await client.sendMedia(message.chatId, mainData.mp3Link, "joox.mp3", "", "audio");
+      if (mainData.lirik) {
+        state.joox_lirik[message.chatId] = true;
+
+        await client.reply(message.chatId, `Apakah anda membutuhkan lirik lagu sekaligus, balas *ya / tidak*, invalid dalam 10 detik`, message.id);
+
+        state.joox_lirik_data[message.chatId] = {
+          timeout: setTimeout(() => {
+            state.joox_lirik[message.chatId] = false;
+            state.joox_lirik_data[message.chatId] = "";
+            client.reply(message.chatId, "Invalid, 10 detik telah berlalu", message.id);
+          }, 10000),
+          data: mainData.lirik
+        };
+      }
+    } else if (body == "tidak") {
+      clearTimeout(state.joox_data[message.chatId].timeout);
+      state.joox[message.chatId] = false;
+      state.joox_data[message.chatId] = "";
+      client.reply(message.chatId, "Oke, dibatalkan", message.id);
+    }
+  }
+
+  if (state.joox_lirik[message.chatId]) {
+    let body = message.body.trim();
+    let mainData = state.joox_lirik_data[message.chatId].data;
+
+    if (body == "ya") {
+      clearTimeout(state.joox_lirik_data[message.chatId].timeout);
+      await client.reply(message.chatId, mainData, message.id);
+    } else if (body == "tidak") {
+      clearTimeout(state.joox_lirik_data[message.chatId].timeout);
+      state.joox_lirik[message.chatId] = false;
+      state.joox_lirik_data[message.chatId] = "";
+      client.reply(message.chatId, "Oke, dibatalkan", message.id);
+    }
+  }
+
   if (state.instagram[message.chatId]) {
     let body = message.body.trim();
     let mainData = state.instagram_data[message.chatId].data;
@@ -214,6 +262,44 @@ module.exports = async (command = "", message, client) => {
         client.reply(message.chatId, msg, message.id);
         return { stop: true };
       };
+
+      break;
+
+    case "joox":
+      if (!secondArgs) {
+        msg = "Format: /joox <query>\nContoh: /joox on my way";
+        client.reply(message.chatId, msg, message.id);
+        return { stop: true };
+      }
+
+      res = await axios.get(
+        `https://zenzapi.xyz/downloader/joox?query=${full}&apikey=rasyidrafi`
+      )
+      data = res.data;
+
+      if (data.status == "OK") {
+        state.joox[message.chatId] = true;
+
+        let caption = `${data.result.lagu}\n\nAlbum: ${data.result.album}\nPenyanyi: ${data.result.penyanyi}\nPublish: ${data.result.publish}\n\nApakah ini benar yang anda maksud, balas *ya / tidak*, invalid dalam 10 detik`;
+
+        await client.sendMedia(message.chatId, data.result.img, "joox.jpg", caption, "image");
+
+        state.joox_data[message.chatId] = {
+          timeout: setTimeout(() => {
+            state.joox[message.chatId] = false;
+            state.joox_data[message.chatId] = "";
+            client.reply(message.chatId, "Invalid, 10 detik telah berlalu", message.id);
+          }, 10000),
+          data: {
+            ...data.result,
+            lirik: data.lirik.result
+          }
+        };
+      } else {
+        msg = "Fitur sedang tidak bisa digunakan / lagu tidak ditemukan";
+        client.reply(message.chatId, msg, message.id);
+        return { stop: true };
+      }
 
       break;
 
