@@ -78,7 +78,7 @@ const connectToWhatsApp = () => {
           }
           if (!message.body) return;
           
-          message.body = message.body.toLowerCase().trim();
+          message.body = message.body.trim();
           const command = message.body.split(" ")[0].substring(1);
           
           const special = await handleSpecial(command, message, client);
