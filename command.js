@@ -223,7 +223,7 @@ module.exports = async (command = "", message) => {
         }
       } else return "Fitur sedang tidak bisa digunakan";
       break;
-
+      
     case "artimimpi":
       if (!secondArgs) return "Format: /artimimpi <kata mimpi>\nContoh: /artimimpi mandi";
       res = await axios.get(

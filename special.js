@@ -11,6 +11,8 @@ const state = {
   caklontong_data: {},
   music: {},
   music_data: {},
+  instagram: {},
+  instagram_data: {},
 };
 
 module.exports = async (command = "", message, client) => {
@@ -105,9 +107,36 @@ module.exports = async (command = "", message, client) => {
       await client.reply(message.chatId, `Sedang Mendownload *${state.music_data[message.chatId].title}*`, message.id);
       await client.sendMedia(message.chatId, state.music_data[message.chatId].url, "musik.mp3", "", "audio");
     } else if (body == "tidak") {
+      clearTimeout(state.music_data[message.chatId].timeout);
       state.music[message.chatId] = false;
       state.music_data[message.chatId] = "";
       client.reply(message.chatId, "Oke, dibatalkan", message.id);
+    }
+  }
+  if (state.instagram[message.chatId]) {
+    let body = message.body.trim();
+    let mainData = state.instagram_data[message.chatId].data;
+    switch (body) {
+      case "semua":
+      case "all":
+        clearTimeout(state.instagram_data[message.chatId].timeout);
+        mainData.forEach(url => {
+          let type = url.includes(".mp4") ? "video" : "image";
+          client.sendMedia(message.chatId, url, "", "", type)
+        })
+        break;
+    
+      default:
+        let custom = parseInt(body);
+        if (isNaN(custom)) {
+          client.reply(message.chatId, "Angka invalid", message.id);
+        } else if (custom == 0 || custom > mainData.length) {
+          client.reply(message.chatId, "Angka invalid", message.id);
+        } else {
+          let type = mainData[custom].includes(".mp4") ? "video" : "image";
+          client.sendMedia(message.chatId, mainData[custom], "", "", type)
+        }
+        break;
     }
   }
 
@@ -175,16 +204,65 @@ module.exports = async (command = "", message, client) => {
           timeout: setTimeout(() => {
             state.music[message.chatId] = false;
             state.music_data[message.chatId] = "";
-            client.reply(message.chatId, "Invalid, anda tidak membalas dalam 10 detik", message.id);
+            client.reply(message.chatId, "Invalid, 10 detik telah berlalu", message.id);
           }, 10000),
           url: data.result.url,
           title: data.result.title,
         };
       } else {
         msg = "Fitur sedang tidak bisa digunakan";
+        client.reply(message.chatId, msg, message.id);
         return { stop: true };
       };
 
+      break;
+
+    case "instagram":
+    case "ig":
+      if (!secondArgs) {
+        msg = "Format: /instagram <url posting>";
+        client.reply(message.chatId, msg, message.id);
+        return { stop: true };
+      }
+
+      res = await axios.get(
+        `https://zenzapi.xyz/downloader/instagram2?url=${full}&apikey=rasyidrafi`
+      )
+      data = res.data;
+
+      if (data.status == "OK") {
+        switch (data.data.length) {
+          case 0:
+            msg = "Url tidak valid / akun private";
+            client.reply(message.chatId, msg, message.id);
+            return { stop: true };
+            break;
+
+          case 1:
+            let type = data.data[0].includes(".mp4") ? "video" : "image";
+            client.sendMedia(message.chatId, data.data[0], "", "", type)
+            break;
+
+          default:
+            state.instagram[message.chatId] = true;
+            let caption = `Terdapat ${data.data.length} postingan, silahkan balas dengan *urutan* postingan yang ingin di download, atau bisa membalas *semua* untuk mendownload semua postingan, invalid dalam 10 detik`;
+            await client.reply(message.chatId, caption, message.id);
+
+            state.instagram_data[message.chatId] = {
+              timeout: setTimeout(() => {
+                state.instagram[message.chatId] = false;
+                state.instagram_data[message.chatId] = {};
+                client.reply(message.chatId, "Invalid, 10 detik telah berlalu", message.id);
+              }, 10000),
+              data: data.data
+            };
+            break;
+        }
+      } else {
+        msg = "Fitur sedang tidak bisa digunakan";
+        client.reply(message.chatId, msg, message.id);
+        return { stop: true };
+      };
       break;
 
     case "caklontong":
