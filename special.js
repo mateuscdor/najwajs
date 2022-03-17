@@ -231,6 +231,7 @@ module.exports = async (command = "", message, client) => {
       data = res.data;
 
       if (data.status == "OK") {
+        console.log(data)
         switch (data.data.length) {
           case 0:
             msg = "Url tidak valid / akun private";
