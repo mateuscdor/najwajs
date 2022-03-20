@@ -117,6 +117,7 @@ module.exports = async (command = "", message, client) => {
       clearTimeout(state.music_data[message.chatId].timeout);
       await client.reply(message.chatId, `Sedang Mendownload *${state.music_data[message.chatId].title}*`, message.id);
       client.sendMedia(message.chatId, state.music_data[message.chatId].url, "musik.mp3", "", "audio");
+      state.music[message.chatId] = false;
     } else if (body == "tidak") {
       clearTimeout(state.music_data[message.chatId].timeout);
       state.music[message.chatId] = false;
@@ -131,6 +132,7 @@ module.exports = async (command = "", message, client) => {
       clearTimeout(state.joox_data[message.chatId].timeout);
       await client.reply(message.chatId, `Sedang Mendownload *${mainData.lagu}*`, message.id);
       await client.sendMedia(message.chatId, mainData.mp3Link, "joox.mp3", "", "audio");
+      state.joox[message.chatId] = false;
       if (mainData.lirik) {
         state.joox_lirik[message.chatId] = true;
 
@@ -159,6 +161,7 @@ module.exports = async (command = "", message, client) => {
     if (body == "ya") {
       clearTimeout(state.joox_lirik_data[message.chatId].timeout);
       await client.reply(message.chatId, mainData, message.id);
+      state.joox_lirik[message.chatId] = false;
     } else if (body == "tidak") {
       clearTimeout(state.joox_lirik_data[message.chatId].timeout);
       state.joox_lirik[message.chatId] = false;
@@ -177,6 +180,7 @@ module.exports = async (command = "", message, client) => {
           let type = url.includes(".mp4") ? "video" : "image";
           client.sendMedia(message.chatId, url, "", "", type)
         })
+        state.instagram[message.chatId] = false;
         break;
 
       default:
