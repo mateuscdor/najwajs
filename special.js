@@ -19,6 +19,13 @@ const state = {
   joox_lirik_data: {}
 };
 
+function turnOfAll(jid) {
+  Object.keys(state).forEach(key => {
+    if (key.includes("_data")) return;
+    state[key][jid] = false;
+  })
+}
+
 module.exports = async (command = "", message, client) => {
   let res = null;
   let data = null;
@@ -43,7 +50,7 @@ module.exports = async (command = "", message, client) => {
       if (!message.body.startsWith("/")) return { stop: true };
     }
   }
-  if (state.caklontong[message.chatId]) {
+  else if (state.caklontong[message.chatId]) {
     let body = message.body;
 
     if (body.startsWith("jawab")) {
@@ -104,7 +111,7 @@ module.exports = async (command = "", message, client) => {
       client.reply(message.chatId, msg, message.id);
     }
   }
-  if (state.music[message.chatId]) {
+  else if (state.music[message.chatId]) {
     let body = message.body.trim();
     if (body == "ya") {
       clearTimeout(state.music_data[message.chatId].timeout);
@@ -117,7 +124,7 @@ module.exports = async (command = "", message, client) => {
       client.reply(message.chatId, "Oke, dibatalkan", message.id);
     }
   }
-  if (state.joox[message.chatId]) {
+  else if (state.joox[message.chatId]) {
     let body = message.body.trim();
     let mainData = state.joox_data[message.chatId].data;
     if (body == "ya") {
@@ -144,7 +151,8 @@ module.exports = async (command = "", message, client) => {
       state.joox_data[message.chatId] = "";
       client.reply(message.chatId, "Oke, dibatalkan", message.id);
     }
-  } else if (state.joox_lirik[message.chatId]) {
+  }
+  else if (state.joox_lirik[message.chatId]) {
     let body = message.body.trim();
     let mainData = state.joox_lirik_data[message.chatId].data;
 
@@ -158,8 +166,7 @@ module.exports = async (command = "", message, client) => {
       client.reply(message.chatId, "Oke, dibatalkan", message.id);
     }
   }
-
-  if (state.instagram[message.chatId]) {
+  else if (state.instagram[message.chatId]) {
     let body = message.body.trim();
     let mainData = state.instagram_data[message.chatId].data;
     switch (body) {
@@ -171,7 +178,7 @@ module.exports = async (command = "", message, client) => {
           client.sendMedia(message.chatId, url, "", "", type)
         })
         break;
-    
+
       default:
         let custom = parseInt(body);
         if (isNaN(custom)) {
@@ -201,13 +208,7 @@ module.exports = async (command = "", message, client) => {
       }
       switch (secondArgs) {
         case "on":
-          if (state.caklontong[message.chatId]) {
-            state.caklontong[message.chatId] = false;
-            msg =
-              "Mode cak lontong dan Simsimi tidak bisa digunakan bersamaan, menonaktifkan mode cak lontong";
-            client.reply(message.chatId, msg, message.id);
-            return { stop: true };
-          }
+          turnOfAll(message.chatId)
 
           state.simsimi[message.chatId] = true;
           msg =
@@ -243,6 +244,7 @@ module.exports = async (command = "", message, client) => {
       )
       data = res.data;
       if (data.status == "OK") {
+        turnOfAll(message.chatId)
         state.music[message.chatId] = true;
         let caption = `${data.result.title}\n\nChannel: ${data.result.channel}\nPublish: ${data.result.published}\n\nApakah ini benar yang anda maksud, balas *ya / tidak*, invalid dalam 10 detik`;
         await client.sendMedia(message.chatId, data.result.thumb, "ytmp3.jpg", caption, "image");
@@ -276,6 +278,7 @@ module.exports = async (command = "", message, client) => {
       data = res.data;
 
       if (data.status == "OK") {
+        turnOfAll(message.chatId)
         state.joox[message.chatId] = true;
 
         let caption = `${data.result.lagu}\n\nAlbum: ${data.result.album}\nPenyanyi: ${data.result.penyanyi}\nPublish: ${data.result.publish}\n\nApakah ini benar yang anda maksud, balas *ya / tidak*, invalid dalam 10 detik`;
@@ -328,6 +331,7 @@ module.exports = async (command = "", message, client) => {
             break;
 
           default:
+            turnOfAll(message.chatId)
             state.instagram[message.chatId] = true;
             let caption = `Terdapat ${data.data.length} postingan, silahkan balas dengan *urutan* postingan yang ingin di download, atau bisa membalas *semua* untuk mendownload semua postingan, invalid dalam 10 detik`;
             await client.reply(message.chatId, caption, message.id);
@@ -359,13 +363,7 @@ module.exports = async (command = "", message, client) => {
 
       switch (secondArgs) {
         case "on":
-          if (state.simsimi[message.chatId]) {
-            state.simsimi[message.chatId] = false;
-            msg =
-              "Mode cak lontong dan Simsimi tidak bisa digunakan bersamaan, menonaktifkan mode simsimi";
-            client.reply(message.chatId, msg, message.id);
-            return { stop: true };
-          }
+          turnOfAll(message.chatId);
 
           state.caklontong[message.chatId] = true;
           msg =
@@ -417,8 +415,13 @@ module.exports = async (command = "", message, client) => {
       break;
 
     default:
-      if (!state.simsimi[message.chatId] && !state.caklontong[message.chatId])
-        return { stop: false };
+      let isAllOff = true;
+      Object.keys(state).forEach(key => {
+        if (key.includes("_data")) return;
+        if (state[key][message.chatId] == true) isAllOff = false;
+      })
+      if (isAllOff) return { stop: false };
+      else return { stop: true }
       break;
   }
 };
