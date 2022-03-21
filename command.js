@@ -223,6 +223,27 @@ module.exports = async (command = "", message) => {
         }
       } else return "Fitur sedang tidak bisa digunakan";
       break;
+
+    case "soundcloud":
+    case "sc":
+      if (!secondArgs) return "Format: /soundcloud <url>";
+      res = await axios.get(
+        `https://zenzapi.xyz/downloader/soundcloud?url=${body}&apikey=rasyidrafi`
+      );
+      data = res.data;
+
+      if (data.status == "OK") {
+        return {
+          caption: `Sedang mendownload *${data.result.title}*`,
+          dataUrl: data.result.thumb,
+          filename: "soundcloudthumb",
+          type: "image",
+          callback: (client) => {
+            client.sendMedia(message.chatId, data.result.url, "soundcloud.mp3", "", "audio");
+          }
+        };
+      } else return "Fitur sedang tidak bisa digunakan / Url tdk valid";
+      break;
       
     case "artimimpi":
       if (!secondArgs) return "Format: /artimimpi <kata mimpi>\nContoh: /artimimpi mandi";
