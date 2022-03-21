@@ -227,13 +227,13 @@ module.exports = async (command = "", message) => {
     case "listsurah":
       // get data from local json
       let listsurah = require(__dirname + "/local/surah.json");
-      console.log(listsurah);
-      if (!secondArgs || isNaN(parseInt(secondArgs) || secondArgs > 114 )){
+      if (!secondArgs || isNaN(parseInt(secondArgs) || (!isNaN(parseInt(secondArgs)) && secondArgs > 114) )){
         let hold = "Daftar List Surah Qur'an\n\n";
         Object.key(listsurah).forEach(key => {
           hold += `${key} : ${listsurah[key]}\n`
         });
         hold += "\nBy Najwa Bot";
+        console.log(hold);
         return hold;
       } else {
         return `Surah ke ${parseInt(secondArgs)} :\n${listsurah[parseInt(secondArgs)]}`;
