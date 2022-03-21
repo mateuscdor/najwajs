@@ -224,6 +224,21 @@ module.exports = async (command = "", message) => {
       } else return "Fitur sedang tidak bisa digunakan";
       break;
 
+    case "listsurah":
+      // get data from local json
+      let listsurah = JSON.parse(require(__dirname + "/local/surah.json"));
+      if (!secondArgs || isNaN(parseInt(secondArgs) || secondArgs > 114 )){
+        let hold = "Daftar List Surah Qur'an\n\n";
+        Object.key(listsurah).forEach(key => {
+          hold += `${key} : ${listsurah[key]}\n`
+        });
+        hold += "\nBy Najwa Bot";
+        return hold;
+      } else {
+        return `Surah ke ${parseInt(secondArgs)} :\n${listsurah[parseInt(secondArgs)]}`;
+      }
+      break;
+
     case "soundcloud":
     case "sc":
       if (!secondArgs) return "Format: /soundcloud <url>";
